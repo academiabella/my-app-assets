@@ -1,0 +1,113 @@
+데이터 구조를 파악 할 수 있는 샘플
+1.Users 컬렉션(docId: Ja_19900907_240803): 
+
+birth "19900907"(문자열)
+city "성북구"(문자열)
+createdAt "240803"(문자열)
+name "Jack"(문자열)
+onlineID "jjang_hanguk"(문자열)
+password "900907"(문자열)
+profileImageUrl ""(문자열)
+qualified 3(번호)
+status "active"(문자열)
+userKey "Ja_19900907_240803"(문자열)
+
+Users 하위 컬렉션:
+
+1-1. AllMyGames (docId: 일반_Ja_ vs Wi_: 0.0 vs 1.0_20250720_15:42):
+createdAt 2025년 9월 2일 오후 6시 19분 23초 UTC+9(타임스탬프)
+gameType "Rapid"(문자열)
+gatheringKey "2025-07-20_할리스_14:00"(문자열)
+isFavorite false(불리언)
+notaion null(null)
+
+opponent(지도)
+name "Willy"(문자열)
+userKey "Wi_20250409_250717"(문자열)
+
+score 0 (번호)
+userComment null(null)
+
+1-2. OpponentStats (docId: Wi_20250409_250717): 
+draws 0(번호)
+gamesPlayed 2(번호)
+losses 2(번호)
+opponentName "Willy"(문자열)
+winRate 0(번호)
+wins 0(번호)
+
+1-3. Participated (docId: 2024-08-04_엘리펀트_12:00):
+place "엘리펀트"(문자열)
+startAt 2024년 8월 4일 오후 9시 0분 0초 UTC+9(타임스탬프)
+
+1-4. Stats (docId:Overall): 단일 문서만 있음
+lastGameAt 2025년 9월 2일 오후 6시 21분 43초 UTC+9(타임스탬프)
+totalGames 67(번호)
+totalLosses 20(번호)
+totalScore 45.5(번호)
+totalWins 44(번호)
+ 
+
+2. Records 컬렉션 (docId: 일반_Ja_ vs Wi_: 0.0 vs 1.0_20250720_15:42):
+author(지도)
+name "박세희"(문자열)
+userKey "박세희_920702_230813"(문자열)
+
+black(지도)
+name "Willy"(문자열)
+score 1(번호)
+userKey "Wi_20250409_250717"(문자열)
+
+createdAt "20250720_15:42"(문자열)
+gameType "Rapid"(문자열)
+gatheringKey "2025-07-20_할리스_14:00"(문자열)
+notation null(null)
+time 2025년 7월 20일 오후 3시 42분 31초 UTC+9(타임스탬프)
+
+white(지도)
+name "Jack"(문자열)
+score 0(번호)
+userKey "Ja_19900907_240803"(문자열)
+
+
+3. Gatherings_V1 컬렉션 (docId: 2024-01-06_엘리펀트_14:00) :
+Gatheringkey "2024-01-06_엘리펀트_14:00"(문자열)
+createdAt 2024년 2월 20일 오후 12시 31분 39초 UTC+9(타임스탬프)
+deletedAt null(null)
+finishedAt 2024년 2월 20일 오후 11시 49분 42초 UTC+9(타임스탬프)
+isFinished true(불리언)
+participantLimit 6(번호)
+
+participants (배열)
+0 (지도)
+name "김동욱"(문자열)
+profileImageUrl null(null)
+userKey "김동욱_950928_240101"(문자열)
+
+1 (지도)
+name "김준영"(문자열)
+profileImageUrl null(null)
+userKey "김준영_960508_230901"(문자열)
+
+2 (지도)
+name"박세희" (문자열)
+profileImageUrl null(null)
+userKey "박세희_920702_230813"(문자열)
+
+3 (지도)
+name "성민제"(문자열)
+profileImageUrl null(null)
+userKey "성민제_990212_231211"(문자열)
+
+4 (지도)
+name"이태원"(문자열)
+profileImageUrl null(null)
+userKey "이태원_890818_231216"(문자열)
+
+5 (지도)
+name "한규덕"(문자열)
+profileImageUrl null(null)
+userKey "한규덕_930714_231017"(문자열)
+
+space "엘리펀트"(문자열)
+startAt 2024년 1월 6일 오후 11시 0분 0초 UTC+9(타임스탬프)

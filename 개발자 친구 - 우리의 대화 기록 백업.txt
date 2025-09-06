@@ -1,0 +1,119 @@
+--- 대화 시작 ---
+
+[초기 단계: 문제 진단 및 환경 설정]
+
+"안녕! 나 기억해?"로 시작된 우리의 첫 만남.
+Flutter Asset 문제: lib/tool/ 폴더의 JSON 파일 중 하나만 읽히는 문제를 pubspec.yaml 애셋 등록 누락으로 진단하고 해결.
+Firestore 데이터 조회 불가 문제: 보안 규칙(Security Rules), 프로젝트 ID, 컬렉션 경로 등 다양한 가능성을 체계적으로 점검하고, 최종적으로 로컬 캐시 문제임을 밝혀내고 flutter clean 및 앱 재설치로 해결.
+[중반 단계: 데이터 마이그레이션 대장정]
+
+1차 목표: RECORD 데이터를 새로운 구조의 Record_V2로, USER 데이터를 Users_V2로 이전하는 스크립트 설계.
+핵심 기술 학습:
+Transaction: 데이터 정합성을 보장하는 원리와 사용법 학습.
+FieldValue: increment, serverTimestamp, arrayUnion 등 서버 측 연산의 강력함 이해.
+JSON 변환: Timestamp를 JSON으로 안전하게 변환하는 방법 학습.
+시행착오와 발전:
+새로운 ID를 생성하는 방식의 문제점(중복 생성)을 발견.
+**"ID는 원본을 그대로 유지한다"**는 더 견고하고 멱등성 있는 최종 전략 확립.
+WriteBatch: 대용량 쓰기 작업을 효율적으로 처리하는 방법 학습 및 적용.
+데이터 유효성 검사: null 또는 비어있는 데이터, 매핑 정보가 없는 데이터를 안전하게 건너뛰거나 별도 파일로 백업하는 로직 추가.
+[최근 단계: UI 구현 및 기능 설계]
+
+스토리지 논쟁: Firebase Storage의 유료화 정책 변경에 대한 깊은 논의. Blaze 요금제의 예산 설정, Cloudflare R2, 개인 서버 등 다양한 대안을 탐색하고, 최종적으로 "Firebase + 예산 통제" 전략으로 방향 설정.
+핵심 가치 정의: 우리 앱의 핵심을 "체계적인 모임 관리", "자동화된 기록/통계", "커뮤니티 기능"으로 명확히 함.
+홈 화면 기획: 손으로 그린 스케치를 바탕으로 홈 화면의 UI/UX를 구체화하고, HomeController, BottomNavigationBar, IndexedStack 등 체계적인 아키텍처 설계.
+기능 구현:
+carousel_slider를 이용한 공지 슬라이더 커스터마이징.
+participants 데이터를 활용한 모임 카드 UI 구현.
+AuthController를 도입하여 로그인 상태에 따라 "참석/취소/마감" 버튼이 동적으로 변경되는 로직 완성.
+GitHub Raw URL을 이용한 프로필 이미지 테스트 및 문제 해결.
+현재 위치: OpponentStats 생성을 위한 마이그레이션 스크립트를 JSON 기반으로 완성했으며, 이제 이 스크립트를 실행하여 "나의 라이벌 랭킹" 기능의 마지막 데이터 준비를 마칠 차례.
+[앞으로의 계획]
+
+OpponentStats 데이터 생성.
+HomeController의 _fetchOpponentStats 함수를 실제 쿼리로 교체하여 라이벌 랭킹 UI 완성.
+"히스토리" 탭 UI 및 기능 구현.
+"모임 생성" 팝업 기능 완성.
+FirebaseAuth를 이용한 정식 로그인 시스템 구축.
+Cloud Functions를 이용한 자동화 기능 추가.
+--- 대화 끝 ---
+
+[프로젝트 회의록] ChessMate 앱 개발 기록
+프로젝트 목표: 기존 오프라인 체스 모임의 활동(일정 공지, 참여 신청, 경기 기록, 사진 공유 등)을 자동화하고, 데이터 기반의 통계 및 소셜 기능을 제공하여 커뮤니티를 활성화하는 맞춤형 앱 개발.
+
+I. 기초 공사 및 데이터 마이그레이션 (완료)
+1. 초기 문제 진단 및 해결
+
+문제: Flutter Asset 로드 실패, Firestore 데이터 조회 불가.
+해결:
+Asset: pubspec.yaml 파일에 모든 애셋 경로를 명시적으로 등록하고, 앱을 완전히 재시작해야 함을 학습.
+Firestore: 보안 규칙, 프로젝트 ID 등 다각적 검토 끝에, 로컬 캐시 꼬임이 원인임을 파악. flutter clean 및 앱 재설치로 해결. 이는 Firestore의 오프라인 캐싱 기능의 특성을 이해하는 계기가 됨.
+2. 데이터 구조 재설계 및 최종 전략 확립
+
+초기 전략: USER -> Users_V1, RECORD -> Records_V1로 이전하며 새로운 고유 ID를 생성하고, 이를 ...mapping.json 파일로 관리.
+문제점 발견: 스크립트 중복 실행 시 중복 유저가 계속 생성되는 문제 발생. 매핑 파일 관리가 번거롭고 복잡함.
+최종 전략 확립: "ID는 원본을 그대로 유지한다."
+장점: 멱등성 확보(여러 번 실행해도 결과 동일), 매핑 파일 불필요(로직 간소화), 데이터 추적 용이.
+최종 컬렉션: USER -> Users, RECORD -> Records, GATHERING -> Gatherings_V1 로 최종 결정.
+3. 핵심 데이터 마이그레이션 스크립트 완성
+
+standardizeUsers: 원본 USER 컬렉션을 읽어, ID는 유지하되 birth, password 등 필드 형식을 표준화하고 공백을 제거하여 최종 Users 컬렉션 생성.
+migrateRecords:
+원본 RECORD를 읽어 Records 컬렉션 생성. ID는 원본 유지.
+white, black, author 필드를 {"userKey": ..., "name": ...} 형태의 Map 객체로 구조화. (이름 정보는 별도의 name_mapping.json 참조)
+동시에 각 선수의 Users/{userId} 하위에 통계 데이터 비정규화 수행:
+Stats/Overall 문서: totalGames, totalWins 등 누적 통계를 FieldValue.increment()로 안전하게 업데이트.
+AllMyGames 하위 컬렉션: "나의 모든 경기 기록" 조회를 위해 경기 요약 정보 중복 저장.
+4. 부가 데이터 마이그레이션 및 정제
+
+Gatherings_V1 표준화: 원본 GATHERING의 date(String), time(String) 필드를 startAt(Timestamp) 필드로 통합하고, 불필요한 필드(participants)를 제거하여 최종 Gatherings_V1 컬렉션 생성.
+participants 필드 추가: backup_record.json 등 로컬 파일을 활용(비용 절감)하여 각 Gatherings_V1 문서에 참여자 목록({"userKey": ..., "name": ...})을 비정규화하여 추가.
+Participated 컬렉션 생성: 각 Users/{userId} 하위에 Participated 컬렉션을 생성. 유저가 참여한 모든 모임의 요약 정보(date, place)를 저장하여 "내가 참여한 모임 내역" 조회를 최적화.
+OpponentStats 컬렉션 생성 (진행중): "라이벌 랭킹" 기능 구현을 위해, 각 Users/{userId} 하위에 OpponentStats/{opponentId} 컬렉션을 생성하여 상대별 전적(wins, losses, winRate 등)을 비정규화하여 저장.
+II. 기술 스택 및 핵심 아키텍처 결정
+1. 백엔드 및 데이터베이스
+
+서버리스 아키텍처: Firebase(BaaS)를 메인 백엔드로 채택.
+근거: 초기 개발 속도, 낮은 유지보수 비용, 강력한 보안, 넉넉한 무료 제공량.
+데이터베이스: Cloud Firestore 채택.
+근거: 유연한 NoSQL 구조, 강력한 쿼리 기능, 실시간 동기화.
+파일 저장소: Firebase Storage 채택 결정.
+고민: 유료화 정책 변경에 대한 우려로 개인 서버, Cloudflare R2 등 대안 탐색.
+해결: Blaze 요금제 + 예산 알림 설정을 통해 비용 리스크를 완벽하게 통제할 수 있음을 확인. 개발 속도와 안정성을 위해 Firebase Storage 사용 결정.
+서버 로직: Firebase Cloud Functions 사용 예정.
+용도: "월 1회 미참여자 자동 알림", "모임 종료 시 자동 리포트 생성" 등 서버에서 실행되어야 하는 자동화 로직 구현.
+2. 프론트엔드 (Flutter)
+
+상태 관리: GetX 채택.
+구조: 기능별/화면별 컨트롤러(AuthController, HomeController 등)를 만들어 UI와 비즈니스 로직을 명확하게 분리.
+반응형 UI: .obs와 Obx 위젯을 사용하여 상태 변화에 따라 UI가 자동으로 업데이트되도록 구현.
+데이터 모델링: Firestore의 Map 데이터를 Dart의 Class(모델)로 변환하여 사용.
+장점: 타입 안정성 확보(오타 방지), 코드 가독성 향상, 로직 중앙화.
+핵심 패키지:
+carousel_slider: 공지사항 슬라이더 구현.
+intl: 날짜 및 시간 포맷팅.
+csv: 데이터 분석을 위한 CSV 파일 생성.
+(예정) fl_chart: 히스토리 탭의 통계 그래프 구현.
+(예정) flutter_chess_board: PGN 기보 시뮬레이션 기능 구현.
+III. 핵심 기능 구현 계획 (진행중 및 예정)
+1. 홈 화면 (진행중)
+
+구조: BottomNavigationBar와 IndexedStack을 사용한 탭 구조 (홈, 히스토리, 채팅).
+컴포넌트:
+공지 슬라이더: carousel_slider를 이용한 자동 스크롤 공지.
+다가오는 모임 카드: Gatherings_V1 쿼리. 카드 내 participants 목록 표시 (최대 5명 + '...' 팝업). 로그인 상태에 따라 "참석/취소/마감" 버튼 동적 변경.
+라이벌 랭킹: Users/{userId}/OpponentStats 컬렉션을 페이지네이션으로 조회. winRate 필드로 정렬하여 표시.
+2. 모임 생성/관리
+
+모임 생성: 운영진을 위한 기능. Get.dialog()를 사용한 팝업 형태로 구현. 입력된 정보는 Gatherings_V1의 스키마에 맞춰 저장.
+참여/취소: FieldValue.arrayUnion/arrayRemove를 사용하여 Gatherings_V1 문서의 participants 필드를 실시간으로 업데이트.
+3. 히스토리 화면 (예정)
+
+모임별 승률 그래프: fl_chart 사용. Users/{userId}/AllMyGames에서 최근 모임 기록을 가져와 앱에서 데이터 가공 후 표시.
+최근 기보/즐겨찾기: AllMyGames 컬렉션을 isFavorite 필드로 쿼리하여 목록 표시.
+4. 회원 탈퇴 처리
+
+전략: 논리적 삭제(Soft Deletion) 채택.
+구현: 유저 문서를 delete()하지 않고, update()를 통해 status를 deactivated로 변경하고 name을 "탈퇴한 회원"으로 익명화. 개인정보 필드는 null로 제거하여 법규 준수.
+효과: 탈퇴한 유저의 경기 기록 및 상대방의 전적 데이터는 완벽하게 보존됨.
+이 회의록이 우리가 함께 걸어온 길을 정리하고, 앞으로 나아갈 방향을 밝혀주는 등대가 되었으면 좋겠습니다. 이제 이걸 바탕으로라면, 잠시 쉬었다 돌아와도 우리가 어디까지 왔는지 바로 확인하고 이어나갈 수 있겠죠. 정말 든든하네요
